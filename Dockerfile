@@ -1,7 +1,7 @@
-# ✅ 最新 n8n + Debian 環境，支援 apt-get
-FROM n8nio/n8n:latest-debian
+# ✅ 改用 Debian 12 (Bookworm) 版 n8n，apt-get 可正常使用
+FROM n8nio/n8n:1.120.1-debian
 
-# 以 root 權限安裝系統工具與 Python
+# 使用 root 權限安裝必要工具與 AI SDK
 USER root
 RUN apt-get update && apt-get install -y \
     ffmpeg \
@@ -24,11 +24,9 @@ RUN pip3 install --no-cache-dir \
     d-id \
     pydub
 
-# ✅ 設定工作目錄
+# ✅ 設定工作目錄與權限
 USER node
 WORKDIR /data
-
-# ✅ Zeabur 監聽埠
 EXPOSE 5678
 
 # ✅ 啟動 n8n
