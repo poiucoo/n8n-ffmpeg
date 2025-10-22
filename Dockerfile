@@ -4,8 +4,10 @@ FROM n8nio/n8n:latest-debian
 # 切換為 root 權限以安裝工具
 USER root
 
-# ✅ 安裝系統依賴
-RUN apt-get update && apt-get install -y \
+# ✅ 修正 apt source（因為 Debian Buster 已 EOL）
+RUN sed -i 's|deb.debian.org/debian|archive.debian.org/debian|g' /etc/apt/sources.list \
+    && sed -i 's|security.debian.org|archive.debian.org/debian-security|g' /etc/apt/sources.list \
+    && apt-get update && apt-get install -y \
     ffmpeg \
     wget \
     curl \
@@ -13,7 +15,7 @@ RUN apt-get update && apt-get install -y \
     unzip \
     python3 \
     python3-pip \
- && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*
 
 # ✅ 安裝常用 AI 套件
 RUN pip3 install --no-cache-dir \
@@ -26,7 +28,7 @@ RUN pip3 install --no-cache-dir \
     d-id \
     pydub
 
-# ✅ 顯示版本確認（在部署時輸出環境資訊）
+# ✅ 顯示版本確認（部署時輸出環境資訊）
 RUN echo "---- Environment Versions ----" && \
     n8n --version && \
     python3 --version && \
