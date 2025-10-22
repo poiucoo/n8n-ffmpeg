@@ -1,5 +1,5 @@
-# ✅ 使用 Ubuntu base（apt-get、Python 都能用）
-FROM n8nio/n8n:1.120.1-ubuntu
+# ✅ 使用官方最新穩定版 n8n
+FROM n8nio/n8n:1.120.1
 
 USER root
 RUN apt-get update && apt-get install -y \
@@ -22,6 +22,13 @@ RUN pip3 install --no-cache-dir \
     apify-client \
     d-id \
     pydub
+
+# ✅ 確認版本輸出（方便你在 Zeabur Logs 中看到）
+RUN echo "---- Environment Versions ----" && \
+    n8n --version && \
+    python3 --version && \
+    ffmpeg -version | head -n 1 && \
+    echo "--------------------------------"
 
 USER node
 WORKDIR /data
