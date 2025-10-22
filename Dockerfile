@@ -1,5 +1,5 @@
-# ✅ 使用官方最新版 n8n
-FROM n8nio/n8n:latest
+# ✅ 使用 n8n 穩定版 + Debian
+FROM n8nio/n8n:1.119.1-debian
 
 USER root
 RUN apt-get update && apt-get install -y \
@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
  && rm -rf /var/lib/apt/lists/*
 
-# ✅ 安裝 AI 工具
+# ✅ 安裝常用 AI 套件
 RUN pip3 install --no-cache-dir \
     google-generativeai \
     openai \
@@ -23,7 +23,7 @@ RUN pip3 install --no-cache-dir \
     d-id \
     pydub
 
-# ✅ 顯示版本資訊
+# ✅ 顯示版本確認
 RUN echo "---- Environment Versions ----" && \
     n8n --version && \
     python3 --version && \
