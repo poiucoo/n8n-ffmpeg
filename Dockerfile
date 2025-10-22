@@ -1,5 +1,5 @@
-# ✅ 使用官方最新穩定版 n8n
-FROM n8nio/n8n:1.120.1
+# ✅ 使用官方最新版 n8n
+FROM n8nio/n8n:latest
 
 USER root
 RUN apt-get update && apt-get install -y \
@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
  && rm -rf /var/lib/apt/lists/*
 
-# ✅ 安裝常用 AI SDK
+# ✅ 安裝 AI 工具
 RUN pip3 install --no-cache-dir \
     google-generativeai \
     openai \
@@ -23,7 +23,7 @@ RUN pip3 install --no-cache-dir \
     d-id \
     pydub
 
-# ✅ 確認版本輸出（方便你在 Zeabur Logs 中看到）
+# ✅ 顯示版本資訊
 RUN echo "---- Environment Versions ----" && \
     n8n --version && \
     python3 --version && \
