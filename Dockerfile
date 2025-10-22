@@ -1,7 +1,6 @@
-# ✅ 改用 Debian 12 (Bookworm) 版 n8n，apt-get 可正常使用
-FROM n8nio/n8n:1.120.1-debian
+# ✅ 使用 Ubuntu base（apt-get、Python 都能用）
+FROM n8nio/n8n:1.120.1-ubuntu
 
-# 使用 root 權限安裝必要工具與 AI SDK
 USER root
 RUN apt-get update && apt-get install -y \
     ffmpeg \
@@ -24,10 +23,7 @@ RUN pip3 install --no-cache-dir \
     d-id \
     pydub
 
-# ✅ 設定工作目錄與權限
 USER node
 WORKDIR /data
 EXPOSE 5678
-
-# ✅ 啟動 n8n
 CMD ["n8n", "start"]
