@@ -29,7 +29,6 @@ RUN pip install --no-cache-dir \
     requests \
     elevenlabs \
     apify-client \
-    d-id \
     pydub
 
 # ✅ 顯示版本確認
