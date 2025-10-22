@@ -1,24 +1,28 @@
-# ✅ 使用 n8n 最新穩定版 + Debian 基底
-FROM n8nio/n8n:latest-debian
+# 🐧 基於 Debian Bookworm（含 Python 3.11）
+FROM python:3.11-slim-bookworm
 
-# 切換為 root 權限以安裝工具
-USER root
+# ⚙️ 基本設定
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Etc/UTC
+ENV NODE_VERSION=20
 
-# ✅ 修正 apt source（因為 Debian Buster 已 EOL）
-RUN sed -i 's|deb.debian.org/debian|archive.debian.org/debian|g' /etc/apt/sources.list \
-    && sed -i 's|security.debian.org|archive.debian.org/debian-security|g' /etc/apt/sources.list \
-    && apt-get update && apt-get install -y \
-    ffmpeg \
-    wget \
+# ✅ 安裝 Node.js + ffmpeg + 其他工具
+RUN apt-get update && apt-get install -y \
     curl \
     git \
+    ffmpeg \
+    wget \
     unzip \
-    python3 \
-    python3-pip \
-    && rm -rf /var/lib/apt/lists/*
+    build-essential \
+ && curl -fsSL https://deb.nodesource.com/setup_$NODE_VERSION.x | bash - \
+ && apt-get install -y nodejs \
+ && rm -rf /var/lib/apt/lists/*
 
-# ✅ 安裝常用 AI 套件
-RUN pip3 install --no-cache-dir \
+# ✅ 安裝 n8n（最新穩定版）
+RUN npm install -g n8n
+
+# ✅ 安裝常用 AI SDK
+RUN pip install --no-cache-dir \
     google-generativeai \
     openai \
     langchain \
@@ -28,18 +32,17 @@ RUN pip3 install --no-cache-dir \
     d-id \
     pydub
 
-# ✅ 顯示版本確認（部署時輸出環境資訊）
+# ✅ 顯示版本確認
 RUN echo "---- Environment Versions ----" && \
+    node -v && \
+    npm -v && \
     n8n --version && \
     python3 --version && \
     ffmpeg -version | head -n 1 && \
     echo "--------------------------------"
 
-# ✅ 切回 n8n 預設用戶
-USER node
+# ✅ 工作目錄與埠
 WORKDIR /data
-
-# ✅ 開放 n8n 預設埠
 EXPOSE 5678
 
 # ✅ 啟動 n8n
