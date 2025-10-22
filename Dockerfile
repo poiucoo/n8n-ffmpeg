@@ -1,17 +1,15 @@
-# 使用 Debian 版 n8n，支援 apt-get
-FROM n8nio/n8n:latest-debian
+# ✅ 使用最新版 n8n（基於 Debian 12 Bookworm + Node 20）
+FROM n8nio/n8n:latest
 
-# 以 root 權限修正套件源並安裝 ffmpeg
+# 以 root 權限安裝 ffmpeg
 USER root
-RUN sed -i 's|deb.debian.org/debian|archive.debian.org/debian|g' /etc/apt/sources.list \
-    && sed -i 's|security.debian.org|archive.debian.org/debian-security|g' /etc/apt/sources.list \
-    && apt-get update && apt-get install -y ffmpeg && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y ffmpeg && rm -rf /var/lib/apt/lists/*
 
-# 切換回 n8n 預設用戶
+# 切換回 n8n 預設使用者
 USER node
 WORKDIR /data
 
-# 開放 5678 埠給 Zeabur 偵測
+# 開放給 Zeabur 偵測的埠
 EXPOSE 5678
 
 # 啟動 n8n
