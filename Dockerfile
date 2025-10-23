@@ -31,7 +31,7 @@ RUN pip install --no-cache-dir \
     apify-client \
     pydub
 
-# ✅ 顯示版本確認
+# ✅ 顯示版本確認（方便除錯）
 RUN echo "---- Environment Versions ----" && \
     node -v && \
     npm -v && \
@@ -40,8 +40,16 @@ RUN echo "---- Environment Versions ----" && \
     ffmpeg -version | head -n 1 && \
     echo "--------------------------------"
 
-# ✅ 工作目錄與埠
-WORKDIR /data
+# ✅ 建立 n8n 預設資料夾
+RUN mkdir -p /home/n8n/.n8n
+
+# ✅ 宣告持久化 Volume（非常重要）
+VOLUME ["/home/n8n/.n8n"]
+
+# ✅ 設定工作目錄（官方預設）
+WORKDIR /home/n8n
+
+# ✅ 開放埠
 EXPOSE 5678
 
 # ✅ 啟動 n8n
