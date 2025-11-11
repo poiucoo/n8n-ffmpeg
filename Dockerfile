@@ -1,4 +1,4 @@
-# 🐧 基於 Debian Bookworm（含 Python 3.11）
+# 基於 Debian Bookworm（含 Python 3.11）
 FROM python:3.11-slim-bookworm
 
 # ⚙️ 基本設定
@@ -14,12 +14,31 @@ RUN apt-get update && apt-get install -y \
     wget \
     unzip \
     build-essential \
+    libnss3 \
+    libgbm1 \
+    libxss1 \
+    libasound2 \
+    libxtst6 \
+    libxrandr2 \
+    libu2f-udev \
  && curl -fsSL https://deb.nodesource.com/setup_$NODE_VERSION.x | bash - \
  && apt-get install -y nodejs \
  && rm -rf /var/lib/apt/lists/*
 
 # ✅ 安裝 n8n（最新穩定版）
 RUN npm install -g n8n
+
+# ✅ 安裝 Playwright 及其瀏覽器依賴
+RUN npm install playwright
+RUN apt-get install -y \
+    libappindicator3-1 \
+    fonts-liberation \
+    libasound2 \
+    libxss1 \
+    libnss3 \
+    libgbm1 \
+    --no-install-recommends \
+ && apt-get clean
 
 # ✅ 安裝常用 AI SDK
 RUN pip install --no-cache-dir \
