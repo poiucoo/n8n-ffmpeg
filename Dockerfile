@@ -6,7 +6,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
 ENV NODE_VERSION=20
 
-# ✅ 安裝 Node.js + ffmpeg + 其他工具
+# ✅ 安裝 OS 依賴 + ffmpeg + zip + Node.js
 RUN apt-get update && apt-get install -y \
     curl \
     git \
@@ -29,19 +29,9 @@ RUN apt-get update && apt-get install -y \
 # ✅ 安裝 n8n（最新穩定版）
 RUN npm install -g n8n
 
-# ✅ 安裝 Playwright 及其瀏覽器依賴
-RUN npm install playwright
-RUN apt-get install -y \
-    libappindicator3-1 \
-    fonts-liberation \
-    libasound2 \
-    libxss1 \
-    libnss3 \
-    libgbm1 \
-    --no-install-recommends \
- && apt-get clean
+# ❌ Playwright 已完全移除（避免 Zeabur build fail）
 
-# ✅ 安裝常用 AI SDK
+# ✅ 安裝常用 AI SDK（你用的）
 RUN pip install --no-cache-dir \
     google-generativeai \
     openai \
@@ -51,7 +41,7 @@ RUN pip install --no-cache-dir \
     apify-client \
     pydub
 
-# ✅ 顯示版本確認（方便除錯）
+# 版本確認（可留可刪）
 RUN echo "---- Environment Versions ----" && \
     node -v && \
     npm -v && \
@@ -60,17 +50,17 @@ RUN echo "---- Environment Versions ----" && \
     ffmpeg -version | head -n 1 && \
     echo "--------------------------------"
 
-# ✅ 建立 n8n 預設資料夾
+# 建立 n8n 預設資料夾
 RUN mkdir -p /home/n8n/.n8n
 
-# ✅ 宣告持久化 Volume（非常重要）
+# 持久化資料（重要）
 VOLUME ["/home/n8n/.n8n"]
 
-# ✅ 設定工作目錄（官方預設）
+# 設定工作目錄
 WORKDIR /home/n8n
 
-# ✅ 開放埠
+# 開放埠
 EXPOSE 5678
 
-# ✅ 啟動 n8n
+# 啟動 n8n
 CMD ["n8n", "start"]
