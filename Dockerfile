@@ -6,15 +6,22 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
 ENV NODE_VERSION=20
 
-# ✅ 安裝 Node.js + ffmpeg + 其他工具
+# ============================================
+# 安裝 OS 依賴 + zip + ffmpeg + Node.js
+# ============================================
 RUN apt-get update && apt-get install -y \
+    # ---- 基本工具 ----
     curl \
-    git \
-    ffmpeg \
     wget \
+    git \
     zip \
     unzip \
     build-essential \
+    ca-certificates \
+    openssl \
+    # ---- ffmpeg ----
+    ffmpeg \
+    # ---- Playwright 依賴 ----
     libnss3 \
     libgbm1 \
     libxss1 \
@@ -22,26 +29,29 @@ RUN apt-get update && apt-get install -y \
     libxtst6 \
     libxrandr2 \
     libu2f-udev \
+    libappindicator3-1 \
+    fonts-liberation \
+    libatk-bridge2.0-0 \
  && curl -fsSL https://deb.nodesource.com/setup_$NODE_VERSION.x | bash - \
  && apt-get install -y nodejs \
  && rm -rf /var/lib/apt/lists/*
 
-# ✅ 安裝 n8n（最新穩定版）
+# ============================================
+# 安裝 n8n（最新穩定版）
+# ============================================
 RUN npm install -g n8n
 
-# ✅ 安裝 Playwright 及其瀏覽器依賴
-RUN npm install playwright
-RUN apt-get install -y \
-    libappindicator3-1 \
-    fonts-liberation \
-    libasound2 \
-    libxss1 \
-    libnss3 \
-    libgbm1 \
-    --no-install-recommends \
- && apt-get clean
+# ============================================
+# 安裝 Playwright（正確流程：先清 cache → 安裝）
+# ============================================
+RUN npm cache clean --force \
+ && npm install playwright \
+ && npx playwright install-deps \
+ && npx playwright install chromium
 
-# ✅ 安裝常用 AI SDK
+# ============================================
+# 安裝常用 AI SDK（Python）
+# ============================================
 RUN pip install --no-cache-dir \
     google-generativeai \
     openai \
@@ -51,7 +61,9 @@ RUN pip install --no-cache-dir \
     apify-client \
     pydub
 
-# ✅ 顯示版本確認（方便除錯）
+# ============================================
+# 顯示版本確認
+# ============================================
 RUN echo "---- Environment Versions ----" && \
     node -v && \
     npm -v && \
@@ -60,17 +72,19 @@ RUN echo "---- Environment Versions ----" && \
     ffmpeg -version | head -n 1 && \
     echo "--------------------------------"
 
-# ✅ 建立 n8n 預設資料夾
+# ============================================
+# 建立 n8n 預設資料夾
+# ============================================
 RUN mkdir -p /home/n8n/.n8n
 
-# ✅ 宣告持久化 Volume（非常重要）
+# 宣告 Volume
 VOLUME ["/home/n8n/.n8n"]
 
-# ✅ 設定工作目錄（官方預設）
+# 設定工作目錄
 WORKDIR /home/n8n
 
-# ✅ 開放埠
+# 開放 port
 EXPOSE 5678
 
-# ✅ 啟動 n8n
+# 啟動 n8n
 CMD ["n8n", "start"]
