@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     git \
     ffmpeg \
     wget \
+    zip \
     unzip \
     build-essential \
     libnss3 \
